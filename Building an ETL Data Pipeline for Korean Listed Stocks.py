@@ -1,5 +1,34 @@
-"""This project builds an ETL data pipeline for Korean listed stocks.
-    국내 상장주식 데이터를 수집·정제·적재하는 ETL 파이프라인입니다."""
+"""
+Project Overview
+This project builds an ETL data pipeline for Korean listed stocks.
+
+Data Sources
+- Naver Finance (HTML scraping)
+- Korea Exchange (KRX) – manual download due to authenticated access requirements
+- WiseIndex (JSON API)
+
+Pipeline Structure
+1. Extract
+2. Transform
+3. Load (MySQL with UPSERT)
+
+Key Features
+- Data cleansing and normalization
+- Handling missing and malformed numeric values
+- Stock type classification
+- Sector composition data integration
+
+Tech Stack
+- Python
+- pandas, numpy
+- requests, BeautifulSoup
+- MySQL
+"""
+
+
+
+
+#국내 상장주식 데이터를 수집·정제·적재하는 ETL 파이프라인입니다.
 
 #데이터 정합성(Data Consistency) 이란 동일한 대상에 대해 서로 다른 데이터가 모순되지 않고, 
 #논리적으로 일치하는 상태를 의미한다. 이러한 정합성의 유지는 굉장히 중요하다.
@@ -273,37 +302,6 @@ mycursor.executemany(query, args)
 con.commit()
 con.close()
 
-
-
-
-
-"""
-##Readme 에 쓸 내용은 여기다가 임시로 적어둠.
-## Project Overview
-This project builds an ETL data pipeline for Korean listed stocks.
-
-## Data Sources
-- Naver Finance (HTML scraping)
-- Korea Exchange (KRX) – manual download due to authenticated access requirements
-- WiseIndex (JSON API)
-
-## Pipeline Structure
-1. Extract
-2. Transform
-3. Load (MySQL with UPSERT)
-
-## Key Features
-- Data cleansing and normalization
-- Handling missing and malformed numeric values
-- Stock type classification
-- Sector composition data integration
-
-## Tech Stack
-- Python
-- pandas, numpy
-- requests, BeautifulSoup
-- MySQL
-"""
 
 
 
