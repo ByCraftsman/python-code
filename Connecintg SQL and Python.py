@@ -2,8 +2,8 @@ import pymysql
 
 #SQL 데이터 불러오기
 con = pymysql.connect(
-    user='root',
-    passwd='5787',
+    user='',
+    passwd='',
     host='127.0.0.1',
     db='shop',
     charset='utf8mb4'
@@ -41,8 +41,8 @@ data #이러한 방식으로 데이터를 불러오면 tuple 형태로 불러오
 
 #파이썬으로 데이터 SQL에 삽입하기
 con = pymysql.connect(
-    user='root',
-    passwd='5787',
+    user='',
+    passwd='',
     host='127.0.0.1',
     db='shop',
     charset='utf8mb4'
@@ -68,7 +68,7 @@ import pandas as pd
 from sqlalchemy import create_engine #pandas SQL에 연결할 때는 SQLalchemy ORM을 사용함
 
 #사용법 -> create_engine('mysql+pymysql://[사용자명]:[비밀번호]@[호스트:포트]/[사용할 데이터베이스]')
-engine = create_engine('mysql+pymysql://root:5787@127.0.0.1:3306/shop')
+engine = create_engine('mysql+pymysql://user:password@127.0.0.1:3306/shop')
 
 query3 = """select * from Goods"""
 goods = pd.read_sql(query3, con=engine)
@@ -82,7 +82,7 @@ import seaborn as sns
 
 iris = sns.load_dataset('iris')
 
-engine = create_engine('mysql+pymysql://root:5787@127.0.0.1:3306/shop')
+engine = create_engine('mysql+pymysql://user:password@127.0.0.1:3306/shop')
 #if_exists = 'replace' 는 해당 테이블이 이미 존재할 시 데이터를 덮어쓴다는 의미임.
 iris.to_sql(name = 'iris', con = engine, index = False, if_exists = 'replace') 
 engine.dispose()
@@ -95,7 +95,7 @@ engine.dispose()
 from sqlalchemy_utils import create_database # <- 데이터베이스를 만들 때 사용하는 함수임.
 
 #'exam'이라는 이름으로 데이터베이스를 만듦. 
-create_database('mysql+pymysql://root:5787@127.0.0.1:3306/exam') 
+create_database('mysql+pymysql://user:password@127.0.0.1:3306/exam') 
 
 price = pd.DataFrame({
     "날짜": ['2021-01-02', '2021-01-03'],
@@ -105,7 +105,7 @@ price = pd.DataFrame({
 })
 
 
-engine2 = create_engine('mysql+pymysql://root:5787@127.0.0.1:3306/exam')
+engine2 = create_engine('mysql+pymysql://user:password@127.0.0.1:3306/exam')
 #if_exists='append'는 테이블이 존재할 경우 기존 테이블에 데이터를 추가함.
 price.to_sql('price', con=engine2, if_exists='append', index=False)
 data_sql = pd.read_sql('price', con=engine2)
@@ -126,7 +126,7 @@ new = pd.DataFrame({
 #하지만 어차피 sql로 저장할때 index=False하면 되서 상관이 없기는 하다.
 price = pd.concat([price, new])
 
-engine = create_engine('mysql+pymysql://root:5787@127.0.0.1:3306/exam')
+engine = create_engine('mysql+pymysql://users:password@127.0.0.1:3306/exam')
 #진짜 문제점은 이렇게 'append'로 해버리면, 그냥 행방향으로 데이터가 추가되버린다는 것이다.
 #그렇다고 'replace'를 사용하면 3개의 행이 잘 나오기는 하는데, 전 시계열 데이터가 있다면
 #그것들이 전부 삭제되어 버리고 'price' 데이터만 남는 것이 문제다.
@@ -148,8 +148,8 @@ price2 = pd.DataFrame({
 args = price2.values.tolist()
 
 
-con = pymysql.connect(user='root',
-                      passwd='5787',
+con = pymysql.connect(user='',
+                      passwd='',
                       host='127.0.0.1',
                       db='exam',
                       charset='utf8mb4')
@@ -170,8 +170,8 @@ con.close()
 
 
 #생성했던 exam 데이터베이스를 삭제함.
-con = pymysql.connect(user='root',
-                      passwd='5787',
+con = pymysql.connect(user='',
+                      passwd='',
                       host='127.0.0.1',
                       db='exam',
                       charset='utf8mb4')
@@ -187,6 +187,7 @@ con.commit()
 
 mycursor.close() 
 con.close()
+
 
 
 
