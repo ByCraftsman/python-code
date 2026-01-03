@@ -29,9 +29,8 @@ BUY_AMOUNT_KRW = 5000000
 KST = pytz.timezone("Asia/Seoul")
 
 
-
+#JWT 헤더 생성 (query_hash 포함)
 def get_headers(query=None):
-    """JWT 헤더 생성 (query_hash 포함)"""
     nonce = str(uuid.uuid4())  # UUID 형식의 nonce 생성
 
     payload = {
@@ -59,9 +58,8 @@ def get_headers(query=None):
 EXCLUDED_MARKETS = ["KRW-SBD", "KRW-BORA", "KRW-MED", "KRW-LSK", "KRW-GRS", "KRW-SAFE", "KRW-CARV", "KRW-MOC", "KRW-STRAX", "KRW-GAME2"]
 
 
-
+#KRW 마켓 목록 가져오기 (제외 목록 필터링 포함)
 def get_markets():
-    """KRW 마켓 목록 가져오기 (제외 목록 필터링 포함)"""
     url = f"{SERVER_URL}/v1/market/all"
     response = requests.get(url, headers=get_headers())
     if response.status_code != 200:
@@ -75,9 +73,8 @@ def get_markets():
 
 
 
-
+#선택된 마켓 가격 정보 가져오기
 def get_ticker_info(filtered_markets):
-    """선택된 마켓 가격 정보 가져오기"""
     url = f"{SERVER_URL}/v1/ticker"
     params = {"markets": ",".join(filtered_markets)}
     response = requests.get(url, headers=get_headers(), params=params)
@@ -87,9 +84,8 @@ def get_ticker_info(filtered_markets):
 
 
 
-
+#주문 UUID를 사용하여 실제 체결된 가격 가져오기
 def get_actual_buy_price(order_uuid):
-    """주문 UUID를 사용하여 실제 체결된 가격 가져오기"""
     url = f"{SERVER_URL}/v1/order"
     params = {"uuid": order_uuid}
 
@@ -111,9 +107,8 @@ def get_actual_buy_price(order_uuid):
 
 
 
-
+#시장가 매수 주문 (재시도 포함)
 def place_market_buy_order(ticker, amount):
-    """시장가 매수 주문 (재시도 포함)"""
     url = f"{SERVER_URL}/v1/orders"
     query = {
         "market": ticker,
@@ -204,9 +199,8 @@ def place_limit_sell_order_with_profit(ticker, order_uuid, profit_rate=0.004, re
 
 
 
-
+#업비트 틱 사이즈에 따라 가격 반올림
 def round_price_to_tick_size(price):
-    """업비트 틱 사이즈에 따라 가격 반올림"""
     if price >= 2000000:
         return round(price, -3)  # 1,000 단위
     elif price >= 1000000:
@@ -274,10 +268,8 @@ def place_limit_sell_order(ticker, target_price, volume):
 
 
 
-    
 
-
-#
+#지정가 매도 실패시 시장가 매도
 def place_market_sell_order(ticker, volume):
     url = f"{SERVER_URL}/v1/orders"
     query = {
@@ -359,7 +351,7 @@ def monitor_and_trade():
 
 
 if __name__ == "__main__":
-    # 9시 45초 이후에는 매수하지 않도록 하는 체크 추가
+    #9시 45초 이후에는 매수하지 않도록 하는 체크 추가
     current_time = datetime.now(KST).strftime("%H:%M:%S")
     PRE_MONITORING_START_TIME = "08:50:00"  # 8시 50분 시작
     PRE_MONITORING_END_TIME = "08:59:50"    # 8시 59분 종료
@@ -413,6 +405,7 @@ if __name__ == "__main__":
 
         # 모니터링 시작
         monitor_and_trade()
+
 
 
 
