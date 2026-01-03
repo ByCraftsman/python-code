@@ -7,6 +7,7 @@ The codebase is organized into two branches:
 - fundamentals: Foundational Python and SQL codes for learning and practice.
 
 
+
 본 레포지토리는 금융 리스크 관리 및 데이터 분석 역량 강화를 위해
 개인적으로 작성한 코드들을 정리한 것입니다.
 
