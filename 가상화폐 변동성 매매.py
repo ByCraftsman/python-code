@@ -384,7 +384,7 @@ if __name__ == "__main__":
                     if market not in base_prices:
                         base_prices[market] = current_price
                     else:
-                        # 2.225% 이상 급등 여부 확인
+                        # 사전의 급등 코인 필터링
                         initial_price = base_prices[market]
                         increase_rate = (current_price - initial_price) / initial_price
                         if increase_rate >= 0.017 and market not in exclude_markets:
@@ -412,4 +412,5 @@ if __name__ == "__main__":
 
 
         
+
 
