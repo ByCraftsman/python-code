@@ -173,9 +173,9 @@ kor_ticker[kor_ticker['종목코드'].str[-1:] !='0']['종목명']
 #리츠 (REITs) 종목은 종목명이 '리츠'로 끝남.
 kor_ticker[kor_ticker['종목명'].str.endswith('리츠')]
 
-
+#이 종목들은 기타로 처리하도록 함.
 diff = list(set(krx_aggregation['종목명']).symmetric_difference(set(krx_ind['종목명'])))
-print(diff)
+print(diff) 
 
 kor_ticker['종목구분'] = np.where(kor_ticker['종목명'].str.contains('스팩|제[0-9]+호'), '스팩',
                               np.where(kor_ticker['종목코드'].str[-1:] != '0', '우선주',
@@ -302,6 +302,7 @@ args = kor_sector.values.tolist()
 mycursor.executemany(query, args)
 con.commit()
 con.close()
+
 
 
 
