@@ -34,7 +34,7 @@ Tech Stack
 파이프라인(Pipeline)이란 데이터가 “정해진 단계들을 순서대로” 거쳐 자동으로 처리되는 흐름을 말한다.
 
 데이터 정합성(Data Consistency) 이란 동일한 대상에 대해 서로 다른 데이터가 모순되지 않고, 
-논리적으로 일치하는 상태를 의미한다. 이러한 정합성의 유지는 필수적 요소이다다.
+논리적으로 일치하는 상태를 의미한다. 이러한 정합성의 유지는 필수적 요소이다.
 """
 
 
@@ -302,6 +302,7 @@ args = kor_sector.values.tolist()
 mycursor.executemany(query, args)
 con.commit()
 con.close()
+
 
 
 
