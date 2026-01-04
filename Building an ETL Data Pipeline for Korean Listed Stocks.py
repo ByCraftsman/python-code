@@ -30,10 +30,14 @@ Tech Stack
 
 #국내 상장주식 데이터를 수집·정제·적재하는 ETL 파이프라인입니다.
 
-#데이터 정합성(Data Consistency) 이란 동일한 대상에 대해 서로 다른 데이터가 모순되지 않고, 
-#논리적으로 일치하는 상태를 의미한다. 이러한 정합성의 유지는 굉장히 중요하다.
+"""
+파이프라인(Pipeline)이란 데이터가 “정해진 단계들을 순서대로” 거쳐 자동으로 처리되는 흐름을 말한다.
 
-#파이프라인(Pipeline)이란 데이터가 “정해진 단계들을 순서대로” 거쳐 자동으로 처리되는 흐름을 말함.
+데이터 정합성(Data Consistency) 이란 동일한 대상에 대해 서로 다른 데이터가 모순되지 않고, 
+논리적으로 일치하는 상태를 의미한다. 이러한 정합성의 유지는 필수적 요소이다다.
+"""
+
+
 import requests as rq
 from bs4 import BeautifulSoup
 import re
@@ -59,7 +63,7 @@ print(parse_day)
 biz_day = re.findall('[0-9]+', parse_day) #숫자만
 biz_day = ''.join(biz_day) #조인
 
-print(biz_day) #이런 날짜 데이터는 매일 자동으로 업데이트 듸므로, 필요한 곳에 사용하면 됨.
+print(biz_day) #이렇게 추출한 날짜 데이터로 기초적인 자동화가 가능하다.
 
 
 
@@ -71,10 +75,10 @@ print(biz_day) #이런 날짜 데이터는 매일 자동으로 업데이트 듸�
 
 #주식 관련 데이터를 구하기 위해서 가장 먼저 해야하는 일은 어떤 종목이 상장되어 있는가에 대한 정보를 구하는 것이다.
 #우리나라의 경우에는 한국거래소에서 제공하는 업종분류 현황과 개별종목 지표 데이터를 이용하면 간단하게 구할 수 있다.
-#하지만 매번 해당 파일을 다운로드하고 이를 불러오는 작업은 상당히 비효율적이기 때문에, 
-#크롤링을 이용한다면 해당 데이터를 파이썬에서 바로 불러올 수 있다.
-#이 코드는 한국거래소 정책 변경으로 제대로 기능하지 못함. 
-#한국거래소는 2025-12-27부로 로그인을 해야만 데이터를 받을 수 있게 바꿧다.
+#하지만 매번 해당 파일을 다운로드하고 이를 불러오는 작업은 상당히 비효율적이기 때문에, 자동화를 하면 효율적이다.
+
+#이 코드는 한국거래소 정책 변경으로 제대로 기능하지 못함.
+#한국거래소는 2025-12-27을 기점으로 로그인을 해야만 데이터를 받을 수 있게 바뀌었다.
 gen_otp_url = 'http://data.krx.co.kr/comm/fileDn/GenerateOTP/generate.cmd'
 gen_otp_stk = {
     'mktId': 'STK',
@@ -90,7 +94,6 @@ headers = {'Referer': 'http://data.krx.co.kr/contents/MDC/MDI/mdiLoader'}
 otp_stk = rq.post(gen_otp_url, gen_otp_stk, headers=headers).text
 print(otp_stk)
 
-
 down_url = 'http://data.krx.co.kr/comm/fileDn/download_csv/download.cmd'
 
 #이 코드를 실행해보면, permission이 없다고 할것이다. (예전까지는 됐었는데 이제는 안됨.)
@@ -104,7 +107,7 @@ sector_stk.head()
 
 
 
-#그래서 그냥 판다스로 불러와서 데이터 처리를 하도록 함.
+#때문에 어쩔 수 없이 데이터를 직접 받아와서 처리하였음.
 krx_kospi = pd.read_excel(r"C:\Users\minec\OneDrive\바탕 화면\파이썬 엑셀파일\코스피_업종분류현황.xlsx", sheet_name='Sheet1')
 krx_kosdaq = pd.read_excel(r"C:\Users\minec\OneDrive\바탕 화면\파이썬 엑셀파일\코스닥_업종분류현황.xlsx", sheet_name='Sheet1')
 
@@ -115,14 +118,13 @@ krx_aggregation['종목명'] = krx_aggregation['종목명'].str.strip() #str.str
 #기준일 열 추가
 krx_aggregation['기준일'] = biz_day 
 
-
 #PER,PBR,배당수익률(개별종목)
 krx_ind = pd.read_excel(r"C:\Users\minec\OneDrive\바탕 화면\파이썬 엑셀파일\PER,PBR,배당수익률(개별종목).xlsx", sheet_name='Sheet1')
 krx_ind['종목명'] = krx_ind['종목명'].str.strip()
 krx_ind['기준일'] = biz_day 
 
 #Stock names are normalized by removing parenthetical annotations. (락)
-#krx_ind는 종목명에 (락)이 붙어 있어서 종목명의 일치가 안되므로 지워줘야함. (최근에 생긴듯.)
+#krx_ind는 종목명에 (락)이 붙어 있어서 종목명의 일치가 안되므로 지워줘야함. (최근에 생겨서 처리해줘야 함.)
 #현업에서의 정석은 Raw data는 재현성과 감사 가능성을 위해 보존하고, 모든 정제 과정은 코드로 처리함. 
 krx_ind['종목명'] = (
     krx_ind['종목명']
@@ -131,15 +133,14 @@ krx_ind['종목명'] = (
 )  #replace로 치환해서 없애주고, 공백까지 제거하였음.
 
 
-#이제 다운로드 받은 데이터를 정리하도록 함. (디버깅 먼저)
-#set으로 집합을 만듦. symmetric_difference로 하나의 집합에만 존재하는 부분을 찾음. 
-#symmetric_difference가 크다는 건 ‘데이터 우주(universe)가 다르다’는 증거임. (락)을 지우기 전에 3387이 나옴.
+#set으로 집합을 만들고, symmetric_difference로 하나의 집합에만 존재하는 부분을 찾음.  
+#symmetric_difference가 크다는 건 ‘데이터 우주(universe)가 다르다’는 증거임. (락)을 지우기 전에는 3387이 나옴.
 len(set(krx_aggregation['종목명']).symmetric_difference(set(krx_ind['종목명'])))
 krx_aggregation['종목명'].dtype
 krx_ind['종목명'].dtype
 
 
-#krx_aggregation과 krx_ind을 합침.
+#이제 최종적으로 krx_aggregation과 krx_ind을 합치도록 함.
 kor_ticker = pd.merge(
     krx_aggregation,
     krx_ind,
@@ -152,14 +153,14 @@ base_cols.discard('종목코드')
 
 for col in base_cols:
     cols = [f"{col}_x", f"{col}_y"]
-    #axis=1로 열기준으로, bfill이기 때문에 오른쪽 값을 왼쪽에 삽입하였음.
+    #axis=1 - 열기준으로, bfill - 오른쪽 값을 왼쪽에 삽입하였음. iloc[:, 0] - 첫번째 열만 선택함.
     kor_ticker[col] = kor_ticker[cols].bfill(axis=1).iloc[:, 0] 
     #원래 있던 _x, _y의 중복 칼럼들 제거.
     kor_ticker.drop(columns=cols, inplace=True)
 
 
 
-#Classifying equity types. 주식들의 종목을 전부 구분해보도록 함.
+#주식들의 종목을 전부 구분해보도록 함. (Classifying equity types.)
 import numpy as np
 #스펙 (SPAC) 추출
 kor_ticker['종목명'].str.contains('스팩|제[0-9]+호')
@@ -301,6 +302,7 @@ args = kor_sector.values.tolist()
 mycursor.executemany(query, args)
 con.commit()
 con.close()
+
 
 
 
