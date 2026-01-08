@@ -1,14 +1,1 @@
-This repository contains personal projects aimed at strengthening my skills in financial risk management and data analysis.
-
-The codebase is organized into two branches:
-
-- main: Code developed with practical, real-world applications in mind.
-- fundamentals: Foundational Python and SQL code used for learning and practice.
-
-
-본 레포지토리는 금융 리스크 관리 및 데이터 분석 역량 강화를 위해 개인적으로 작성한 코드들을 정리한 것입니다.
-
-- 실무에 실질적인 적용을 목적으로 한 코드
-- 기본적인 파이썬, SQL에 관한 코드
-
-로 분리하여 관리하고 있습니다.
+2023년도에 대학수업하면서 작성한 코드입니다. 전부 수정 후 옮길 예정인 코드를 임시 보관중입니다.
