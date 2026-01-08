@@ -3,7 +3,7 @@ from sqlalchemy import create_engine
 import pandas as pd
 
 # DB 연결
-engine = create_engine('mysql+pymysql://root:5787@127.0.0.1:3306/stock_db')
+engine = create_engine('mysql+pymysql://usert:password@127.0.0.1:3306/stock_db')
 
 # 티커 리스트
 ticker_list = pd.read_sql("""
@@ -72,9 +72,9 @@ import pandas as pd
 import numpy as np
 
 # DB 연결
-engine = create_engine('mysql+pymysql://root:5787@127.0.0.1:3306/stock_db')
-con = pymysql.connect(user='root',
-                      passwd='5787',
+engine = create_engine('mysql+pymysql://user:password@127.0.0.1:3306/stock_db')
+con = pymysql.connect(user='user',
+                      passwd='password',
                       host='127.0.0.1',
                       db='stock_db',
                       charset='utf8')
@@ -155,5 +155,6 @@ con.commit()
 
 engine.dispose()
 con.close()
+
 
 
