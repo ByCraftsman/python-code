@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 import pandas as pd
 import numpy as np
 
-engine = create_engine('mysql+pymysql://root:5787@127.0.0.1:3306/stock_db')
+engine = create_engine('mysql+pymysql://user:password@127.0.0.1:3306/stock_db')
 
 ticker_list = pd.read_sql("""
 select * from kor_ticker
@@ -63,7 +63,7 @@ df_mom_cum.plot(figsize=(10, 6),
 from sqlalchemy import create_engine
 import pandas as pd
 
-engine = create_engine('mysql+pymysql://root:5787@127.0.0.1:3306/stock_db')
+engine = create_engine('mysql+pymysql://user:password@127.0.0.1:3306/stock_db')
 
 ticker_list = pd.read_sql(
 """
@@ -199,7 +199,7 @@ from sqlalchemy import create_engine
 import pandas as pd
 import numpy as np
 
-engine = create_engine('mysql+pymysql://root:5787@127.0.0.1:3306/stock_db')
+engine = create_engine('mysql+pymysql://user:password@127.0.0.1:3306/stock_db')
 
 ticker_list = pd.read_sql("""
 select * from kor_ticker
@@ -242,6 +242,7 @@ quality_rank = quality_list_copy.rank(ascending=False, axis=0)
 quality_sum = quality_rank.sum(axis=1, skipna=False).rank()
 quality = quality_list.loc[quality_sum <=20,
                            ['종목코드', '종목명', 'ROE', 'GPA', 'CFO']].round(4)
+
 
 
 
