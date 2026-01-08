@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 import pandas as pd
 import numpy as np
 
-engine = create_engine('mysql+pymysql://root:5787@127.0.0.1:3306/stock_db')
+engine = create_engine('mysql+pymysql://user:password@127.0.0.1:3306/stock_db')
 
 value_list = pd.read_sql("""
 select * from kor_value
@@ -58,7 +58,7 @@ from sqlalchemy import create_engine
 import pandas as pd
 import numpy as np
 
-engine = create_engine('mysql+pymysql://root:5787@127.0.0.1:3306/stock_db')
+engine = create_engine('mysql+pymysql://user:password@127.0.0.1:3306/stock_db')
 
 ticker_list = pd.read_sql("""
 select * from kor_ticker
@@ -153,7 +153,7 @@ from sqlalchemy import create_engine
 import pandas as pd
 from scipy.stats import zscore
 
-engine = create_engine('mysql+pymysql://root:5787@127.0.0.1:3306/stock_db')
+engine = create_engine('mysql+pymysql://user:password@127.0.0.1:3306/stock_db')
 
 ticker_list = pd.read_sql("""
 select * from kor_ticker
@@ -215,7 +215,7 @@ from sqlalchemy import create_engine
 import pandas as pd
 import numpy as np
 
-engine = create_engine('mysql+pymysql://root:5787@127.0.0.1:3306/stock_db')
+engine = create_engine('mysql+pymysql://user:password@127.0.0.1:3306/stock_db')
 
 value_list = pd.read_sql("""
 select * from kor_value
@@ -279,6 +279,7 @@ for n, ax in enumerate(axes.flatten()):
     ax.set_title(value_rank.columns[n], size=12)
 
 fig.tight_layout()
+
 
 
 
