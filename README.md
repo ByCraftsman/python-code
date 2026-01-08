@@ -1,1 +1,4 @@
 필요할때마다 참조할 수 있도록 코드를 작성하였습니다.
+
+
+The code was written so that it can be referenced whenever needed.
