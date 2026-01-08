@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 import pandas as pd
 
-engine = create_engine('mysql+pymysql://root:5787@127.0.0.1:3306/stock_db')
+engine = create_engine('mysql+pymysql://user:password@127.0.0.1:3306/stock_db')
 price = pd.read_sql('select * from sample_etf;', con=engine)
 price = price.set_index(['Date'])
 engine.dispose()
@@ -168,6 +168,7 @@ backtest = bt.Backtest(strategy, data)
 result = bt.run(backtest)
 
 result.plot()
+
 
 
 
