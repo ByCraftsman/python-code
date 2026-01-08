@@ -5,7 +5,7 @@ import statsmodels.api as sm
 from scipy.stats import zscore
 import matplotlib.pyplot as plt
 
-engine = create_engine('mysql+pymysql://root:5787@127.0.0.1:3306/stock_db')
+engine = create_engine('mysql+pymysql://user:password@127.0.0.1:3306/stock_db')
 
 ticker_list = pd.read_sql("""
 select * from kor_ticker
@@ -198,6 +198,7 @@ port_qvm['invest'] = np.where(port_qvm['qvm'].rank() <= 20, 'Y', 'N')
 
 #최종포트폴리오 엑셀파일로 저장
 port_qvm[port_qvm['invest'] == 'Y']['종목코드'].to_excel('model.xlsx', index=False)
+
 
 
 
