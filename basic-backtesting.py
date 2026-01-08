@@ -2,7 +2,7 @@ import bt  #Backtesting.py
 from sqlalchemy import create_engine
 import pandas as pd
 
-engine = create_engine('mysql+pymysql://root:5787@127.0.0.1:3306/stock_db')
+engine = create_engine('mysql+pymysql://user:password@127.0.0.1:3306/stock_db')
 price = pd.read_sql('select * from sample_etf;', con=engine)
 price = price.set_index(['Date'])
 engine.dispose()
@@ -94,6 +94,7 @@ gdaa_result = bt.run(gdaa_backtest, gdaa_backtest_net)
 gdaa_result.prices
 gdaa_result.plot()
 stat = gdaa_result.stats
+
 
 
 
