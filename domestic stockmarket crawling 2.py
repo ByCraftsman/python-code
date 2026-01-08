@@ -15,7 +15,7 @@ like stock splits or mergers, leading to inaccurate performance analysis.
 
 from sqlalchemy import create_engine
 import pandas as pd
-engine = create_engine('mysql+pymysql://root:5787@127.0.0.1:3306/stock_db')
+engine = create_engine('mysql+pymysql://user:password@127.0.0.1:3306/stock_db')
 #최신 기준일에 해당하는 데이터만 불러올 것이기 때문에, select from에서
 #서브 쿼리에 select max를 해서 where 구문에 넣어주었다. 그중에서 보통주만 가져옴.
 query = """
@@ -73,9 +73,9 @@ from tqdm import tqdm
 from io import BytesIO
 
 # DB 연결
-engine = create_engine('mysql+pymysql://root:5787@127.0.0.1:3306/stock_db')
-con = pymysql.connect(user='root',
-                      passwd='5787',
+engine = create_engine('mysql+pymysql://user:password@127.0.0.1:3306/stock_db')
+con = pymysql.connect(user='id',
+                      passwd='your password',
                       host='127.0.0.1',
                       db='stock_db',
                       charset='utf8')
@@ -146,6 +146,7 @@ for i in tqdm(range(0, len(ticker_list))):
 # DB 연결 종료
 engine.dispose()
 con.close()
+
 
 
 
