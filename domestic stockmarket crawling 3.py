@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 import pandas as pd
 
-engine = create_engine('mysql+pymysql://root:5787@127.0.0.1:3306/stock_db')
+engine = create_engine('mysql+pymysql://user:password@127.0.0.1:3306/stock_db')
 query = """
 select * from kor_ticker
 where 기준일 = (select max(기준일) from kor_ticker) 
@@ -101,7 +101,7 @@ from tqdm import tqdm
 import time
 
 # DB 연결
-engine = create_engine('mysql+pymysql://root:5787@127.0.0.1:3306/stock_db')
+engine = create_engine('mysql+pymysql://user:password@127.0.0.1:3306/stock_db')
 con = pymysql.connect(user='root',
                       passwd='5787',
                       host='127.0.0.1',
@@ -210,6 +210,7 @@ for i in tqdm(range(0, len(ticker_list))):
 # DB 연결 종료
 engine.dispose()
 con.close()
+
 
 
 
