@@ -27,4 +27,8 @@ print('The price of the put option is: $', round(P, 2))
 ~
 
 
+#옵션에서 핵심적인 이론이므로, 시간날 때 제대로 코드를 짜는 게 좋을듯.
+
+
+
 
