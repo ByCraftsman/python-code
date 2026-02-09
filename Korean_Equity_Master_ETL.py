@@ -15,9 +15,10 @@ GET 방식이라서 URL를 조작하여서 쉽게 원하는 시계열만큼의 �
 
 
 
-#전종목의 티커별 시계열 정보를 크롤링하여 MYSQL에 적제하도록 함.
+#코스닥, 코스피의 보통주 티커별 시계열 정보를 크롤링하여 MYSQL에 적재하도록 함.
 from sqlalchemy import create_engine
 import pandas as pd
+
 """
 kor_ticker는 'Building an ETL Data Pipeline for Korean Listed Stocks'코드에서 정제한 테이블이다.
 
@@ -73,7 +74,7 @@ price['종목코드'] = ticker
 
 
 
-# 전 코드를 기반으로 하여, 모든 종목의 주가 데이터를 MySQL에 적재하도록 한다.
+#위에서 짠 단일 종목 코드를 기반으로 하여, 모든 종목의 주가 데이터를 MySQL에 적재하도록 한다.
 """
 why pymysql?
 
@@ -133,7 +134,7 @@ for i in tqdm(range(0, len(ticker_list))):
     fr = (date.today() + relativedelta(years=-5)).strftime("%Y%m%d")
     to = (date.today()).strftime("%Y%m%d")
 
-    #위쪽 코드는 어차피 오류가 날 일이 없는 부분이라, 여기부터 try하면됨.
+    # 위쪽 코드는 어차피 오류가 날 일이 없는 부분이라, 여기부터 try하면됨.
     try:
 
         # url 생성
@@ -178,7 +179,7 @@ con.close()
 
 
 
-#여기서 부터는 전종목 제무제표 정보를 크롤링하여서 SQL에 적제하도록 한다.
+#코스닥, 코스피의 보통주 재무제표 정보를 크롤링하여 MYSQL에 적재하도록 함.
 from sqlalchemy import create_engine
 import pandas as pd
 
@@ -239,31 +240,31 @@ data_fs_y = data_fs_y.rename(columns={data_fs_y.columns[0]: "계정"})
 
 
 
-#연간 재무제표에서 연말에는 연 데이터 대신 분기 데이터가 들어가므로, 제거해줘야 함.
+#연간 재무제표의 연말즈음에는 연 데이터 대신 분기 데이터가 들어가므로, 제거해줘야 함.
 import requests as rq
 from bs4 import BeautifulSoup
 import re
 
-#html를 불러옴
+# html를 불러옴
 page_data = rq.get(url)
 
-#BeatifulSoup 객체로 변환함
+# BeatifulSoup 객체로 변환함
 page_data_html = BeautifulSoup(page_data.content, 'html.parser')
 
 fiscal_data = page_data_html.select('div.corp_group1 > h2')
 
 fiscal_data_text = fiscal_data[1].text
 
-#숫자만 추출
+# 숫자만 추출
 fiscal_data_text = re.findall('[0-9]+', fiscal_data_text)
 
-#모든 행, 열이름이 '계정' | (or의 의미) 뒷자리 2개가 결산월과 일치하는 부분 선택.
+# 모든 행, 열이름이 '계정' | (or의 의미) 뒷자리 2개가 결산월과 일치하는 부분 선택.
 data_fs_y = data_fs_y.loc[:, (data_fs_y.columns == '계정') |
                           (data_fs_y.columns.str[-2:].isin(fiscal_data_text))]
 
 
 
-#분기 데이터
+# 분기 데이터
 data_fs_q = pd.concat(
     [data[1].iloc[:, ~data[1].columns.str.contains('전년동기')],
      data[3],
@@ -276,17 +277,17 @@ data_fs_q = data_fs_q.rename(columns={data_fs_q.columns[0]: "계정"})
 
 def clean_fs(df, ticker, frequency):
 
-    #'계정' 컬럼을 제외한 나머지 모든 컬럼이 NaN인 행을 제거하는 전처리 코드임.
+    # '계정' 컬럼을 제외한 나머지 모든 컬럼이 NaN인 행을 제거하는 전처리 코드임.
     df = df[~df.loc[:, ~df.columns.isin(['계정'])].isna().all(axis=1)]
-    #중복되는 계정 명을 제거하는데, 중복되는 것 중 첫번째 값은 남김.
+    # 중복되는 계정 명을 제거하는데, 중복되는 것 중 첫번째 값은 남김.
     df = df.drop_duplicates(['계정'], keep='first')
-    #멜트를 이용하여 긴행 형태로 만듦.
+    # 멜트를 이용하여 긴행 형태로 만듦.
     df = pd.melt(df, id_vars='계정', var_name='기준일', value_name='값')
-    #nan값 제거
+    # nan값 제거
     df = df[~pd.isnull(df['값'])]
-    #필요없는 문자열 제거
+    # 필요없는 문자열 제거
     df['계정'] = df['계정'].replace({'계산에 참여한 계정 펼치기': ''}, regex=True)
-    #데이트타임 형태로 바꾸면서 핸들링하기 편한 월말 형태로 변환
+    # 데이트타임 형태로 바꾸면서 핸들링하기 편한 월말 형태로 변환
     df['기준일'] = pd.to_datetime(df['기준일'],
                                format='%Y/%m') + pd.tseries.offsets.MonthEnd()
     df['종목코드'] = ticker
@@ -296,17 +297,17 @@ def clean_fs(df, ticker, frequency):
 
 
 
-#함수 실행
+# 함수 실행
 data_fs_y_clean = clean_fs(data_fs_y, ticker, 'y')
 data_fs_q_clean = clean_fs(data_fs_q, ticker, 'q')
 
-#연 데이터 + 분기 데이터 concat
+# 연 데이터 + 분기 데이터 concat
 data_fs_bind = pd.concat([data_fs_y_clean, data_fs_q_clean])
 
 
 
 
-#MY SQL에 데이터 적제하기
+#MY SQL에 보통주 재무제표 정보 적재하기
 import pymysql
 from tqdm import tqdm
 import time
@@ -369,7 +370,7 @@ for i in tqdm(range(0, len(ticker_list))):
         data_fs_y = data_fs_y.loc[:, (data_fs_y.columns == '계정') | (
             data_fs_y.columns.str[-2:].isin(fiscal_data_text))]
 
-        #사전에 만든 함수 실행
+        # 사전에 만든 함수 실행
         data_fs_y_clean = clean_fs(data_fs_y, ticker, 'y')
 
         # 분기 데이터
@@ -381,7 +382,7 @@ for i in tqdm(range(0, len(ticker_list))):
         
         data_fs_q = data_fs_q.rename(columns={data_fs_q.columns[0]: "계정"})
 
-        #사전에 만든 함수 실행
+        # 사전에 만든 함수 실행
         data_fs_q_clean = clean_fs(data_fs_q, ticker, 'q')
 
         # 두개 합치기
@@ -404,6 +405,7 @@ for i in tqdm(range(0, len(ticker_list))):
 # DB 연결 종료
 engine.dispose()
 con.close()
+
 
 
 
