@@ -1,7 +1,7 @@
 
 use stock_db;
 
--- 전종목 시계열 정보 적제
+-- 전종목 시계열 정보 적재
 create table kor_price
 (
     날짜 date,
@@ -15,7 +15,6 @@ create table kor_price
     primary key(날짜, 종목코드) 
 );
 
--- 기본적인 뼈대가 만들어 진것을 확인가능.
 select * from kor_price;
 
 
@@ -27,7 +26,7 @@ select count(distinct(종목코드)) from kor_price;
 
 
 
--- 전종목 재무제표 정보 적제
+-- 전종목 재무제표 정보 적재
 use stock_db;
 
 create table kor_fs
