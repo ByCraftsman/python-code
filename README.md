@@ -10,5 +10,3 @@ The codebase is organized into two branches:
 
 - 실무에 실질적인 적용을 목적으로 한 코드
 - 기본적인 파이썬, SQL에 관한 코드
-
-로 분리하여 관리하고 있습니다.
