@@ -1,16 +1,31 @@
 """
-Adjusted prices are essential for backtesting to ensure continuity.
-Raw prices can cause significant distortions in returns during corporate events 
-like stock splits or mergers, leading to inaccurate performance analysis.
+This code implements a preprocessing pipeline for Korean equity price data
+and financial statements, designed for financial analysis of individual stocks
 
-퀀트 투자나 벡테스트에서는 수정주가가 필요하다. 일반적인 주가는 액면분할이나 액면병합
- 등의 사건이 있을 시, 수익률에 엄청난 왜곡이 생길 수 있기 때문이다.
+본 파이프라인은 국내 주식 시장의 주가 및 재무제표 데이터를 전처리하여,
+개별 종목에 대한 다양한 금융 분석에 활용하기 위해 설계되었다.
 
 
-Naver Finance is used because its charts are based on adjusted prices.
 
-네이버 증권의 차트는 수정주가를 기준으로 되어 있기 때문에, 네이버 증권을 사용하였다.
-GET 방식이라서 URL를 조작하여서 쉽게 원하는 시계열만큼의 데이터를 얻을 수 있었다.
+Adjusted prices are essential for backtesting, as they ensure price continuity.
+Raw prices can cause significant distortions in the returns during corporate events 
+like stock splits or reverse splits, leading to inaccurate performance analysis. Therefore, 
+Naver Finance is used as the primary data source because its charts are based on adjusted prices.
+
+퀀트 투자나 벡테스트에서는 수정주가가 필요하다. 일반적인 주가는 액면분할이나 액면병합 등의 사건이 있을 시, 
+수익률에 왜곡이 생길 수 있기 때문이다. 그렇기 때문에, 수정주가를 사용하는 네이버 증권을 사용하였다. 
+또한 네이버 증권은 GET 방식이라서 URL를 통해 간단하게 원하는 만큼의 시계열 데이터를 얻을 수 있었다.
+
+
+
+Although financial statement data can also be collected from Naver Finance, the site is built as a dynamic web page,
+which requires packages such as Selenium and makes the process cumbersome. In contrast, FN Guide provides
+financial statement data in a structured tabular format, with relatively stable account names and time-series column structures. 
+For these reasons, FN Guide was selected as it is more advantageous from a maintenance perspective.
+
+네이버 증권에서도 재무제표 데이터를 수집할 수 있으나, 해당 페이지는 동적 페이지로 구성되어 있어 Selenium과 같은
+패키지가 필요하여 번거롭다. 반면, FN Guide는 재무제표 데이터를 정형화된 테이블 구조로 제공하며, 
+항목명과 시계열 컬럼 구조가 비교적 안정적으로 유지된다. 유지보수차원에서도 유리하여서 FN Guide를 선택하였다.
 """
 
 
@@ -195,14 +210,6 @@ engine.dispose()
 i = 0
 ticker = ticker_list['종목코드'][i]
 
-"""
-네이버 증권으로도 재무제표 정보를 받을 수는 있으나, 동적 페이지로 구성되어 있어서 셀레니움 (크롤링이 오래 걸림) 이 필요하다.
-그렇기 때문에 fnguide 사이트를 이용하여 재무제표 정보를 가져온다.
-
-네이버 증권은 재무제표 구조가 자주 바뀌는 반면, FN Guide는 항목과 시계열 구조가 안정적이라 
-자동화 파이프라인 구축에 유리하다. 네이버를 사용하면 유지보수할 때 번거로울 수 밖에 없다.
-"""
-
 url = f'http://comp.fnguide.com/SVO2/ASP/SVD_Finance.asp?pGB=1&gicode=A{ticker}'
 
 #displayed_only는 기본적으로 True이기 때문에 false 설정을 안하면 + 항목에 안에 들어있는 상세내역을 가져오지 않는다.
@@ -212,9 +219,9 @@ data = pd.read_html(url, displayed_only=False)
 
 
 """
-테이블 정제 전에 다시 정리하자면,
-loc은 라벨 기반 인덱싱이라 컬럼명이나 인덱스명을 사용하고,
-iloc은 정수 위치 기반 인덱싱이라 컬럼이나 행의 순서를 사용함.
+테이블 정제 전에 다시 정리하자면, loc은 라벨 기반 인덱싱이라 컬럼명이나 인덱스명을 사용하고,
+iloc은 정수 위치 기반 인덱싱이라 컬럼이나 행의 순서를 사용함. 
+
 그렇기 때문에 loc이 코드 가독성과 유지보수 측면에서 유리함.
 """
 
@@ -405,6 +412,7 @@ for i in tqdm(range(0, len(ticker_list))):
 # DB 연결 종료
 engine.dispose()
 con.close()
+
 
 
 
