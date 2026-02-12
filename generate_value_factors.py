@@ -15,7 +15,7 @@ import os
 from dotenv import load_dotenv
 
 # .env 파일 경로 지정
-dotenv_path = r"C:\Users\minec\OneDrive\바탕 화면\파이썬\python-code\.env"
+dotenv_path = r"C:\Users\minec\OneDrive\바탕 화면\python-code\.env"
 load_dotenv(dotenv_path)
 
 DB_USER = os.getenv("DB_USER")
@@ -176,6 +176,7 @@ con.commit()
 
 
 con.close() #con.close() → pymysql 전용
+
 
 
 
