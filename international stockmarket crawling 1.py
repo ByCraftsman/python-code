@@ -22,7 +22,7 @@ for i in market:
 stock_bind = pd.concat(stock)
 
 
-
+깃 실험용.
 
 
 
