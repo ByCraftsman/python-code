@@ -9,15 +9,28 @@
 3. 자본(Stock 계정)은 4개 분기 단순 평균으로 근사하였다.
 """
 
+from sqlalchemy import create_engine
+import pandas as pd
+import os
+from dotenv import load_dotenv
+
+# .env 파일 경로 지정
+dotenv_path = r"C:\Users\minec\OneDrive\바탕 화면\파이썬\python-code\.env"
+load_dotenv(dotenv_path)
+
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT")
+DB_NAME = os.getenv("DB_NAME")
+
 
 
 
 #단일 종목으로 가치지표를 구한 후, 해당 로직을 이용하여 전 종목의 가치지표를 구하도록 한다.
-from sqlalchemy import create_engine
-import pandas as pd
 
 # DB 연결
-engine = create_engine('mysql+pymysql://ID:PASSWORD@127.0.0.1:3306/stock_db')
+engine = create_engine(f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
 
 # 티커 리스트
 ticker_list = pd.read_sql("""
@@ -76,13 +89,17 @@ ticker_list_dividend['DY'] = ticker_list_dividend['주당배당금'] / ticker_li
 import pymysql
 
 # DB 연결
-engine = create_engine('mysql+pymysql://ID:PASSWORD@127.0.0.1:3306/stock_db')
-con = pymysql.connect(user='ID',
-                      passwd='PASSWORD',
-                      host='127.0.0.1',
-                      db='stock_db',
-                      charset='utf8')
+engine = create_engine(f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
+con = pymysql.connect(
+    user=DB_USER,
+    passwd=DB_PASSWORD,
+    host=DB_HOST,
+    db=DB_NAME,
+    charset='utf8')
+
 mycursor = con.cursor()
+
+
 
 # 분기 재무제표 불러오기
 kor_fs = pd.read_sql("""
@@ -144,10 +161,11 @@ mycursor.executemany(query, args_fs)
 con.commit()
 
 
+
+
 ticker_list['값'] = ticker_list['주당배당금'] / ticker_list['종가']
 ticker_list['값'] = ticker_list['값'].round(4)
 ticker_list['지표'] = 'DY'
-
 dy_list = ticker_list[['종목코드', '기준일', '지표', '값']]
 dy_list = dy_list.replace([np.inf, -np.inf, np.nan], None)
 dy_list = dy_list[dy_list['값'] != 0] #0인 값은 버림
@@ -155,7 +173,6 @@ dy_list = dy_list[dy_list['값'] != 0] #0인 값은 버림
 args_dy = dy_list.values.tolist()
 mycursor.executemany(query, args_dy)
 con.commit()
-
 
 
 con.close() #con.close() → pymysql 전용
