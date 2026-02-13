@@ -60,7 +60,7 @@ def get_headers(query=None):
 
 
 
-#매수에서 제외하는 코인(원하는 바에 따라 임의로 설정함.)
+#매수에서 제외하는 코인 (임의로 설정함.)
 EXCLUDED_MARKETS = ["KRW-SBD", "KRW-BORA", "KRW-MED", "KRW-LSK", "KRW-GRS", "KRW-SAFE", "KRW-CARV", "KRW-MOC", "KRW-STRAX", "KRW-GAME2"]
 
 

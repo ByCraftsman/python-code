@@ -29,6 +29,18 @@ For these reasons, FN Guide was selected as it is more advantageous from a maint
 """
 
 
+import os
+from dotenv import load_dotenv
+
+dotenv_path = r"C:\Users\minec\OneDrive\바탕 화면\python-code\.env"
+load_dotenv(dotenv_path)
+
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT")
+DB_NAME = os.getenv("DB_NAME")
+
 
 #코스닥, 코스피의 보통주 티커별 시계열 정보를 크롤링하여 MYSQL에 적재하도록 함.
 from sqlalchemy import create_engine
@@ -43,7 +55,7 @@ kor_ticker는 'Building an ETL Data Pipeline for Korean Listed Stocks'코드에�
 우선주는 거래량이 적고 의결권이 없어 분석 모델에서 제외하는 것이 일반적임.
 """
 
-engine = create_engine('mysql+pymysql://ID:PASSWORD@127.0.0.1:3306/stock_db')
+engine = create_engine(f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
 query = """
 select * from kor_ticker
 where 기준일 = (select max(기준일) from kor_ticker) 
@@ -110,12 +122,13 @@ import time
 from tqdm import tqdm
 
 # DB 연결
-engine = create_engine('mysql+pymysql://ID:PASSWORD@127.0.0.1:3306/stock_db')
-con = pymysql.connect(user='',
-                      passwd='',
-                      host='127.0.0.1',
-                      db='stock_db',
-                      charset='utf8')
+engine = create_engine(f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
+con = pymysql.connect(
+      user=DB_USER,
+      passwd=DB_PASSWORD,
+      host=DB_HOST,
+      db=DB_NAME,
+      charset='utf8')
 mycursor = con.cursor()
 
 # 티커리스트 불러오기
@@ -198,7 +211,7 @@ con.close()
 from sqlalchemy import create_engine
 import pandas as pd
 
-engine = create_engine('mysql+pymysql://ID:PASSWORD@127.0.0.1:3306/stock_db')
+engine = create_engine(f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
 query = """
 select * from kor_ticker
 where 기준일 = (select max(기준일) from kor_ticker) 
@@ -320,12 +333,13 @@ from tqdm import tqdm
 import time
 
 # DB 연결
-engine = create_engine('mysql+pymysql://ID:PASSWORD@127.0.0.1:3306/stock_db')
-con = pymysql.connect(user='',
-                      passwd='',
-                      host='127.0.0.1',
-                      db='stock_db',
-                      charset='utf8')
+engine = create_engine(f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
+con = pymysql.connect(
+      user=DB_USER,
+      passwd=DB_PASSWORD,
+      host=DB_HOST,
+      db=DB_NAME,
+      charset='utf8')
 mycursor = con.cursor()
 
 # 티커리스트 불러오기

@@ -9,12 +9,10 @@
 3. 자본(Stock 계정)은 4개 분기 단순 평균으로 근사하였다.
 """
 
-from sqlalchemy import create_engine
-import pandas as pd
+
 import os
 from dotenv import load_dotenv
 
-# .env 파일 경로 지정
 dotenv_path = r"C:\Users\minec\OneDrive\바탕 화면\python-code\.env"
 load_dotenv(dotenv_path)
 
@@ -28,7 +26,8 @@ DB_NAME = os.getenv("DB_NAME")
 
 
 #단일 종목으로 가치지표를 구한 후, 해당 로직을 이용하여 전 종목의 가치지표를 구하도록 한다.
-
+from sqlalchemy import create_engine
+import pandas as pd
 # DB 연결
 engine = create_engine(f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
 
@@ -63,6 +62,7 @@ import numpy as np
 
 sample_fs['ttm'] = np.where(sample_fs['계정'] == '자본',
                             sample_fs['ttm'] / 4, sample_fs['ttm']) 
+
 sample_fs = sample_fs.groupby(['계정', '종목코드']).tail(1)
 
 sample_fs_merge = sample_fs[['계정', '종목코드', 'ttm']].merge(

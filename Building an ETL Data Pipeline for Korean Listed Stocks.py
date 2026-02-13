@@ -37,14 +37,22 @@ Tech Stack
 논리적으로 일치하는 상태를 의미한다. 이러한 정합성의 유지는 필수적 요소이다.
 """
 
-
+import os
+from dotenv import load_dotenv
 import requests as rq
 from bs4 import BeautifulSoup
 import re
 from io import BytesIO
 import pandas as pd
 
+dotenv_path = r"C:\Users\minec\OneDrive\바탕 화면\python-code\.env"
+load_dotenv(dotenv_path)
 
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT")
+DB_NAME = os.getenv("DB_NAME")
 
 
 #네이버 증권의 증시 자금 동향 날짜 불러오기
@@ -220,12 +228,12 @@ kor_ticker = kor_ticker.replace({np.nan: None})
 
 #정제한 DataFrame을 SQL에 전송하기. 
 import pymysql
-con = pymysql.connect(user='',
-                      passwd='',
-                      host='127.0.0.1',
-                      db='stock_db',
-                      charset='utf8')
-
+con = pymysql.connect(
+      user=DB_USER,
+      passwd=DB_PASSWORD,
+      host=DB_HOST,
+      db=DB_NAME,
+      charset='utf8')
 mycursor = con.cursor()
 #upsert를 구현하는 query의 작성.
 query = r"""
@@ -239,7 +247,7 @@ query = r"""
 args = kor_ticker.values.tolist() #values를 리스트 형태로 바꿔야 함.
 mycursor.executemany(query, args) #전송
 con.commit()
-mycursor.close()
+
 con.close()
 #----------------------------------------------------------------------------------------------------------------
 
@@ -283,13 +291,14 @@ kor_sector['기준일'] = biz_day
 kor_sector['기준일'] = pd.to_datetime(kor_sector['기준일'])
 
 
-#SQL 연결
-con = pymysql.connect(user='',
-                      passwd='',
-                      host='127.0.0.1',
-                      db='stock_db',
-                      charset='utf8')
 
+
+con = pymysql.connect(
+      user=DB_USER,
+      passwd=DB_PASSWORD,
+      host=DB_HOST,
+      db=DB_NAME,
+      charset='utf8')
 mycursor = con.cursor()
 query = r"""
     insert into kor_sector (IDX_CD, CMP_CD, CMP_KOR, SEC_NM_KOR, 기준일)
@@ -301,6 +310,7 @@ query = r"""
 args = kor_sector.values.tolist()
 mycursor.executemany(query, args)
 con.commit()
+
 con.close()
 
 
