@@ -1,3 +1,7 @@
+#예전에는 잘 됐었는데 이제 안되므로 대대적인 수정이 필요함. 확장가능한 형태로 재구성하는 것도 좋을듯??
+
+
+
 import json
 import pandas as pd
 import requests as rq
@@ -21,8 +25,6 @@ for i in market:
     
 stock_bind = pd.concat(stock)
 
-
-깃 실험용.
 
 
 
@@ -100,10 +102,10 @@ driver.quit()
 
 import pymysql
 
-con = pymysql.connect(user='root',
-                      passwd='5787',
-                      host='127.0.0.1',
-                      db='stock_db',
+con = pymysql.connect(user='',
+                      passwd='',
+                      host='',
+                      db='',
                       charset='utf8')
 
 mycursor = con.cursor()

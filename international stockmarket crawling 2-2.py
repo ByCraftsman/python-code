@@ -41,11 +41,11 @@ from tqdm import tqdm
 import numpy as np
 
 # DB 연결
-engine = create_engine('mysql+pymysql://user:password@127.0.0.1:3306/stock_db')
-con = pymysql.connect(user='root',
-                      passwd='5787',
-                      host='127.0.0.1',
-                      db='stock_db',
+engine = create_engine('mysql+pymysql://')
+con = pymysql.connect(user='',
+                      passwd='',
+                      host='',
+                      db='',
                       charset='utf8')
 
 mycursor = con.cursor()
