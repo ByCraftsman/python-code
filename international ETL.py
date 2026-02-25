@@ -1,7 +1,5 @@
 #이 프로젝트는 자동화를 목표로 짜보자.
 
-
-
 """
 import keyring # 내부적으로 Windows Vault에 저장하여 암호화해주는 패키지 
 
@@ -19,65 +17,68 @@ print("Saved key:", api_key)
 
 
 
-
-
 import keyring
 from tiingo import TiingoClient
 import pandas as pd
 
 
 api_key = keyring.get_password('tiingo', 'bycraftsman')
+print("Saved key:", api_key)
+
+
 config = {}
 config['session'] = True
 config['api_key'] = api_key
 client = TiingoClient(config)
 
 
+tickers = client.list_stock_tickers()
+tickers_df = pd.DataFrame.from_records(tickers)
+
+tickers_df.head()
+
+tickers_df.groupby(['exchange', 'priceCurrency'])['ticker'].count()
+
+
+
+ticker_metadata = client.get_ticker_metadata("AAPL")
+print(ticker_metadata)
+
+
+historical_prices = client.get_dataframe("AAPL",
+                                         startDate='2017-08-01',
+                                         frequency='daily')
+
+historical_prices.head()
+
+
+
+fundamentals_daily = client.get_fundamentals_daily('AAPL')
+fundamentals_daily_df = pd.DataFrame.from_records(fundamentals_daily)
+
+fundamentals_daily_df.head()
 
 
 
 
 
+fundamentals_stmnts = client.get_fundamentals_statements(
+    'AAPL', startDate='2019-01-01', asReported=True, fmt='csv')
+
+df_fs = pd.DataFrame([x.split(',') for x in fundamentals_stmnts.split('\n')])
+df_fs.columns = df_fs.iloc[0]
+df_fs = df_fs[1:]
+df_fs.set_index('date', drop=True, inplace=True)
+df_fs = df_fs[df_fs.index != '']
+
+df_fs.head()
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-import json
-import pandas as pd
-import requests as rq
-import time
-
-market = ['nyse', 'nasdaq', 'amex']
-stock = list()
-
-for i in market:
-    url = f'https://www.hankyung.com/globalmarket/data/price?type={i}&sort=market_cap_top&sector_nm=&industry_nm=&chg_net_text='
-
-    data = rq.get(url).json()
-    data_pd = pd.json_normalize(data['list'])
-    data_pd['symbol'] = data_pd['symbol'].str.replace('-US', '')
-    data_pd['symbol'] = data_pd['symbol'].str.replace('.', '-')
-    
-    stock.append(data_pd)
-    
-    time.sleep(2)
-    
-    
-stock_bind = pd.concat(stock)
+싹다 갈아엎어야 함. investing.com은 크롤링 차단 심하고 HTML 구조 자주 변경되서
+예전에 짠 코드가 작동하지 않음. 안정적으로 재무제표 및 시계열 데이터를 구할 수 있는 곳으로 변경하고
+아래 코드는 지우도록 함.
 
 
 
@@ -101,6 +102,19 @@ nationcode = '5'
 url = f'''https://investing.com/stock-screener/?sp=country::
 {nationcode}|sector::a|industry::a|equityType::ORD%3Ceq_market_cap;1'''
 driver.get(url)
+
+html = BeautifulSoup(driver.page_source, 'lxml')
+html.find(class_='js-search-input inputDropDown')['value']
+
+html_table = html.select('table.genTbl.openTbl.resultsStockScreenerTbl.elpTbl')
+
+print(html_table[0])
+
+
+
+
+
+
 
 WebDriverWait(driver, 10).until(EC.visibility_of_element_located(
     (By.XPATH, '//*[@id="resultsTable"]/tbody')))
