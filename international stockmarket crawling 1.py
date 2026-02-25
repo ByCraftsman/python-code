@@ -1,4 +1,58 @@
-#예전에는 잘 됐었는데 이제 안되므로 대대적인 수정이 필요함. 확장가능한 형태로 재구성하는 것도 좋을듯??
+#이 프로젝트는 자동화를 목표로 짜보자.
+
+
+
+"""
+import keyring # 내부적으로 Windows Vault에 저장하여 암호화해주는 패키지 
+
+#보안을 위하여 딱 한번만 실행하고 코드를 지우도록 하자.
+keyring.set_password(
+    "System",
+    "User Name",
+    "Your API Key"
+)
+
+# 저장 확인
+api_key = keyring.get_password("System", "User Name")
+print("Saved key:", api_key)
+"""
+
+
+
+
+
+import keyring
+from tiingo import TiingoClient
+import pandas as pd
+
+
+api_key = keyring.get_password('tiingo', 'bycraftsman')
+config = {}
+config['session'] = True
+config['api_key'] = api_key
+client = TiingoClient(config)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
