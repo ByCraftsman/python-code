@@ -9,10 +9,10 @@ This repository contains personal projects aimed at strengthening my skills in f
 The codebase is organized into two branches:
 
 - **main**: Code developed with practical, real-world applications in mind.
+- (실무 적용을 목적으로 한 코드)
 - **fundamentals**: Foundational Python and SQL code used for learning and practice.
+- (기초 파이썬 및 SQL 학습 코드)
 
-- **main**: 실무에 실질적인 적용을 목적으로 한 코드
-- **fundamentals**: 기본적인 파이썬, SQL에 관한 코드
 
 
 ## Main Branch Projects
