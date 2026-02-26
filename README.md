@@ -20,7 +20,17 @@ The codebase is organized into two branches:
 ### 1. Risk Measurement (VaR & ES)
 - **File:** `VaR_ES_Framework.py`
 - Implements parametric, historical, and Monte Carlo VaR/ES
-- Includes backtesting and model validation
+
+- Performs regulatory-style backtesting:
+  - Kupiec unconditional coverage test
+  - Christoffersen independence test
+  - Conditional coverage test
+- Identifies model limitations such as fat tails and violation clustering
+- Extends static models to dynamic volatility approaches:
+  - EWMA (RiskMetrics)
+  - GARCH (planned)
+  - Filtered Historical Simulation (planned)
+- Demonstrates practical risk-model validation aligned with Basel principles
 
 ### 2. Financial Data ETL Pipeline
 - **Files:**
