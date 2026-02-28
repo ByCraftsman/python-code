@@ -15,67 +15,141 @@ api_key = keyring.get_password("System", "User Name")
 print("Saved key:", api_key)
 """
 
-
-
 import keyring
 from tiingo import TiingoClient
 import pandas as pd
+from datetime import date
+from io import StringIO
 
 
+
+
+# 1. Tiingo Client 설정
 api_key = keyring.get_password('tiingo', 'bycraftsman')
 print("Saved key:", api_key)
+config = {
+    'session': True,
+    'api_key': api_key
+}
 
-
-config = {}
-config['session'] = True
-config['api_key'] = api_key
 client = TiingoClient(config)
 
 
-tickers = client.list_stock_tickers()
-tickers_df = pd.DataFrame.from_records(tickers)
-
-tickers_df.head()
-
-tickers_df.groupby(['exchange', 'priceCurrency'])['ticker'].count()
 
 
+#메타데이터 기준으로 시계열 주가 데이터 추출
+#애플 주식을 기준으로 일단 1번 짜보고 후에 전종목으로 확장해서 SQL에 적재하는 방식으로 가는 게 나을듯.
+# 2. 메타데이터 조회
+ticker = "AAPL"
 
-ticker_metadata = client.get_ticker_metadata("AAPL")
-print(ticker_metadata)
+metadata = client.get_ticker_metadata(ticker)
+print(metadata)
 
+start_date = metadata.get("startDate")
+end_date = metadata.get("endDate")
 
-historical_prices = client.get_dataframe("AAPL",
-                                         startDate='2017-08-01',
-                                         frequency='daily')
+# endDate가 None이면 오늘 날짜로 설정
+if end_date is None:
+    end_date = date.today().isoformat()
 
-historical_prices.head()
-
-
-
-fundamentals_daily = client.get_fundamentals_daily('AAPL')
-fundamentals_daily_df = pd.DataFrame.from_records(fundamentals_daily)
-
-fundamentals_daily_df.head()
+print(f"{ticker} 기간: {start_date} ~ {end_date}")
 
 
 
 
+# 3. 시계열 가격 데이터
+try:
+    prices = client.get_dataframe(
+        ticker,
+        startDate=start_date,
+        endDate=end_date,
+        frequency="daily"
+    )
 
-fundamentals_stmnts = client.get_fundamentals_statements(
-    'AAPL', startDate='2019-01-01', asReported=True, fmt='csv')
+    # 필요한 컬럼만 선택
+    prices = prices[['adjClose', 'adjVolume']]
 
-df_fs = pd.DataFrame([x.split(',') for x in fundamentals_stmnts.split('\n')])
-df_fs.columns = df_fs.iloc[0]
-df_fs = df_fs[1:]
-df_fs.set_index('date', drop=True, inplace=True)
-df_fs = df_fs[df_fs.index != '']
+    # ticker 컬럼 추가 (SQL 적재 대비)
+    prices['ticker'] = ticker
 
-df_fs.head()
+    # 인덱스 → 컬럼 변환
+    prices.reset_index(inplace=True)
+    prices.rename(columns={'date': 'tradeDate'}, inplace=True)
+
+except Exception as e:
+    print(f"가격 데이터 오류: {e}")
+    prices = pd.DataFrame()
 
 
 
 
+# 4. Daily Fundamentals
+try:
+    fundamentals_daily = client.get_fundamentals_daily(ticker)
+    fundamentals_df = pd.DataFrame.from_records(fundamentals_daily)
+
+    if not fundamentals_df.empty:
+        fundamentals_df['ticker'] = ticker
+        fundamentals_df['date'] = pd.to_datetime(fundamentals_df['date'])
+
+except Exception as e:
+    print(f"fundamentals_daily 오류: {e}")
+    fundamentals_df = pd.DataFrame()
+
+
+
+
+# 5. 재무제표
+try:
+    fundamentals_stmnts = client.get_fundamentals_statements(
+        ticker,
+        startDate='2017-01-01',
+        asReported=True,
+        fmt='csv'
+    )
+
+    df_fs = pd.read_csv(StringIO(fundamentals_stmnts))
+
+    if not df_fs.empty:
+        df_fs['date'] = pd.to_datetime(df_fs['date'])
+        df_fs.set_index('date', inplace=True)
+        df_fs = df_fs.apply(lambda col: pd.to_numeric(col, errors='coerce'))
+        df_fs['ticker'] = ticker
+
+except Exception as e:
+    print(f"재무제표 오류: {e}")
+    df_fs = pd.DataFrame()
+
+
+
+
+# 6. 결과 확인
+print("\n[Prices]")
+print(prices.head())
+
+print("\n[Fundamentals Daily]")
+print(fundamentals_df.head())
+
+print("\n[Financial Statements]")
+print(df_fs.head())
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-------------------------------------------------------------------------------------------------
 싹다 갈아엎어야 함. investing.com은 크롤링 차단 심하고 HTML 구조 자주 변경되서
 예전에 짠 코드가 작동하지 않음. 안정적으로 재무제표 및 시계열 데이터를 구할 수 있는 곳으로 변경하고
 아래 코드는 지우도록 함.
