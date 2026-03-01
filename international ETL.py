@@ -20,6 +20,7 @@ from tiingo import TiingoClient
 import pandas as pd
 from datetime import date
 from io import StringIO
+import time
 
 
 
@@ -39,7 +40,7 @@ client = TiingoClient(config)
 
 #메타데이터 기준으로 시계열 주가 데이터 추출
 #애플 주식을 기준으로 일단 1번 짜보고 후에 전종목으로 확장해서 SQL에 적재하는 방식으로 가는 게 나을듯.
-# 2. 메타데이터 조회
+# 2. 메타데이터 기반으로 시계열 정보를 가져옴
 ticker = "AAPL"
 
 metadata = client.get_ticker_metadata(ticker)
@@ -86,16 +87,16 @@ except Exception as e:
 # 4. Daily Fundamentals
 try:
     fundamentals_daily = client.get_fundamentals_daily(ticker)
-    fundamentals_df = pd.DataFrame.from_records(fundamentals_daily)
+    df_f = pd.DataFrame.from_records(fundamentals_daily)
 
     if not fundamentals_df.empty:
-        fundamentals_df['ticker'] = ticker
-        fundamentals_df['date'] = pd.to_datetime(fundamentals_df['date'])
+        df_f['ticker'] = ticker
+        df_f['date'] = pd.to_datetime(df_f['date'])
+        df_f.sort_values('date', inplace=True)
 
 except Exception as e:
     print(f"fundamentals_daily 오류: {e}")
-    fundamentals_df = pd.DataFrame()
-
+    df_f = pd.DataFrame()
 
 
 
@@ -111,10 +112,14 @@ try:
     df_fs = pd.read_csv(StringIO(fundamentals_stmnts))
 
     if not df_fs.empty:
-        df_fs['date'] = pd.to_datetime(df_fs['date'])
-        df_fs.set_index('date', inplace=True)
-        df_fs = df_fs.apply(lambda col: pd.to_numeric(col, errors='coerce'))
         df_fs['ticker'] = ticker
+
+    # 숫자 변환
+    for col in df_fs.columns:
+        try:
+            df_fs[col] = pd.to_numeric(df_fs[col])
+        except:
+            pass
 
 except Exception as e:
     print(f"재무제표 오류: {e}")
@@ -139,135 +144,100 @@ print(df_fs.head())
 
 
 
+#위의 단일종목에 대한 로직을 다우 30종목에 적용하도록 함.
+#tiingo에서 무료로 받을 수 있는 게 다우지수라서 다우지수를 기준으로한 ETL 코드를 짜도록 하자.
+DOW30 = [
+    "AAPL","MSFT","JPM","V","PG","GS","HD","CVX","MRK","UNH",
+    "KO","DIS","MCD","NKE","AMGN","TRV","AXP","CRM","HON","IBM",
+    "INTC","WMT","BA","CAT","CSCO","JNJ","MMM","VZ","WBA","DOW"
+]
 
 
+all_prices = []
+all_fundamentals = []
+all_statements = []
 
 
+for i, ticker in enumerate(DOW30, start=1):
+    print(f"[{i}/{len(DOW30)}] 처리 중: {ticker}")
 
+    # 4-1. Metadata
+    metadata = client.get_ticker_metadata(ticker)
+    start_date = metadata.get("startDate")
+    end_date = metadata.get("endDate") or date.today().isoformat()
 
-
-
-
-
--------------------------------------------------------------------------------------------------
-싹다 갈아엎어야 함. investing.com은 크롤링 차단 심하고 HTML 구조 자주 변경되서
-예전에 짠 코드가 작동하지 않음. 안정적으로 재무제표 및 시계열 데이터를 구할 수 있는 곳으로 변경하고
-아래 코드는 지우도록 함.
-
-
-
-
-
-
-
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
-from bs4 import BeautifulSoup
-from datetime import datetime
-import math
-import pandas as pd
-import numpy as np
-from tqdm import tqdm
-import time
-
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
-nationcode = '5'
-url = f'''https://investing.com/stock-screener/?sp=country::
-{nationcode}|sector::a|industry::a|equityType::ORD%3Ceq_market_cap;1'''
-driver.get(url)
-
-html = BeautifulSoup(driver.page_source, 'lxml')
-html.find(class_='js-search-input inputDropDown')['value']
-
-html_table = html.select('table.genTbl.openTbl.resultsStockScreenerTbl.elpTbl')
-
-print(html_table[0])
-
-
-
-
-
-
-
-WebDriverWait(driver, 10).until(EC.visibility_of_element_located(
-    (By.XPATH, '//*[@id="resultsTable"]/tbody')))
-
-end_num = driver.find_element(By.CLASS_NAME, value='js-total-results').text
-end_num = math.ceil(int(end_num) / 50)
-
-
-all_data_df = []
-
-for i in tqdm(range(1, end_num + 1)):
-
-    url = f'''https://investing.com/stock-screener/?sp=country::
-        {nationcode}|sector::a|industry::a|equityType::ORD%3Ceq_market_cap;{i}'''
-    driver.get(url)
-
+    # 4-2. 가격 데이터
     try:
-        WebDriverWait(driver, 10).until(EC.visibility_of_element_located(
-            (By.XPATH, '//*[@id="resultsTable"]/tbody')))
-    except:
-        time.sleep(1)
-        driver.refresh()
-        WebDriverWait(driver, 10).until(EC.visibility_of_element_located(
-            (By.XPATH, '//*[@id="resultsTable"]/tbody')))
+        prices = client.get_dataframe(
+            ticker,
+            startDate=start_date,
+            endDate=end_date,
+            frequency="daily"
+        )
 
-    html = BeautifulSoup(driver.page_source, 'lxml')
+        if not prices.empty:
+            prices = prices[['adjClose', 'adjVolume']]
+            prices['ticker'] = ticker
+            prices.reset_index(inplace=True)
+            prices.rename(columns={'date': 'tradeDate'}, inplace=True)
+            all_prices.append(prices)
 
-    html_table = html.select(
-        'table.genTbl.openTbl.resultsStockScreenerTbl.elpTbl')
-    df_table = pd.read_html(html_table[0].prettify())
-    df_table_select = df_table[0][['Name', 'Symbol',
-                                   'Exchange',  'Sector', 'Market Cap']]
+    except Exception as e:
+        print(f"가격 오류: {ticker} → {e}")
 
-    all_data_df.append(df_table_select)
+    # 4-3. Daily Fundamentals
+    try:
+        fundamentals_daily = client.get_fundamentals_daily(ticker)
+        df_f = pd.DataFrame.from_records(fundamentals_daily)
 
-    time.sleep(2)
+        if not df_f.empty:
+            df_f['ticker'] = ticker
+            df_f['date'] = pd.to_datetime(df_f['date'])
+            df_f.sort_values('date', inplace=True)
+            all_fundamentals.append(df_f)
 
-all_data_df_bind = pd.concat(all_data_df, axis=0)
+    except Exception as e:
+        print(f"fundamentals 오류: {ticker} → {e}")
 
-data_country = html.find(class_='js-search-input inputDropDown')['value']
-all_data_df_bind['country'] = data_country
-all_data_df_bind['date'] = datetime.today().strftime('%Y-%m-%d')
-all_data_df_bind = all_data_df_bind[~all_data_df_bind['Name'].isnull()]
-all_data_df_bind = all_data_df_bind[all_data_df_bind['Exchange'].isin(
-    ['NASDAQ', 'NYSE', 'NYSE Amex'])]
-all_data_df_bind = all_data_df_bind.drop_duplicates(['Symbol'])
-all_data_df_bind.reset_index(inplace=True, drop=True)
-all_data_df_bind = all_data_df_bind.replace({np.nan: None})
+    # 4-4. 재무제표
+    try:
+        fundamentals_stmnts = client.get_fundamentals_statements(
+            ticker,
+            startDate='2017-01-01',
+            asReported=True,
+            fmt='csv'
+        )
 
-driver.quit()
+        df_fs = pd.read_csv(StringIO(fundamentals_stmnts))
+
+        if not df_fs.empty:
+            df_fs['ticker'] = ticker
+            all_statements.append(df_fs)
+
+    except Exception as e:
+        print(f"재무제표 오류: {ticker} → {e}")
+
+    time.sleep(3)  
+
+# 5. 병합
+prices_df = pd.concat(all_prices, ignore_index=True)
+fundamentals_df = pd.concat(all_fundamentals, ignore_index=True)
+statements_df = pd.concat(all_statements, ignore_index=True)
+
+print("완료")
+print("prices:", prices_df.shape)
+print("fundamentals:", fundamentals_df.shape)
+print("statements:", statements_df.shape)
 
 
 
-import pymysql
 
-con = pymysql.connect(user='',
-                      passwd='',
-                      host='',
-                      db='',
-                      charset='utf8')
 
-mycursor = con.cursor()
-query = """
-    insert into global_ticker (Name, Symbol, Exchange, Sector, `Market Cap`, country, date)
-    values (%s,%s,%s,%s,%s,%s,%s) as new
-    on duplicate key update
-    name=new.name,Exchange=new.Exchange,Sector=new.Sector,
-    `Market Cap`=new.`Market Cap`; 
-"""
 
-args = all_data_df_bind.values.tolist()
 
-mycursor.executemany(query, args)
-con.commit()
 
-con.close()
+
+
 
 
 
