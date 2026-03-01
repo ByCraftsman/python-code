@@ -18,7 +18,7 @@ The codebase is organized into two branches:
 ## Main Branch Projects
 
 ### 1. Risk Measurement (VaR & ES)
-- **File:** `VaR_ES_Framework.py`
+ - **File:** [`VaR_ES_Framework.py`](./VaR_ES_Framework.py)
 - Implements parametric, historical, and Monte Carlo VaR/ES
 
 - Performs regulatory-style backtesting:
@@ -34,9 +34,9 @@ The codebase is organized into two branches:
 
 ### 2. Financial Data ETL Pipeline
 - **Files:**
-  - `Building_an_ETL_Data_Pipeline_for_Korean_Listed_Stocks.py`
-  - `Korean_Equity_Price_FS_ETL.py`
-  - `generate_value_factors.py`
+ - [`Building_an_ETL_Data_Pipeline_for_Korean_Listed_Stocks.py`](./Building_an_ETL_Data_Pipeline_for_Korean_Listed_Stocks.py)
+ - [`Korean_Equity_Price_FS_ETL.py`](./Korean_Equity_Price_FS_ETL.py)
+ - [`Generate_Value_Factors.py`](./Generate_Value_Factors.py)
 - Extracts, transforms, and loads Korean equity market data
 - Generates value factors for quantitative analysis
 
