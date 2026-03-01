@@ -15,6 +15,16 @@ api_key = keyring.get_password("System", "User Name")
 print("Saved key:", api_key)
 """
 
+
+
+
+
+
+
+
+
+
+
 import keyring
 from tiingo import TiingoClient
 import pandas as pd
@@ -89,7 +99,7 @@ try:
     fundamentals_daily = client.get_fundamentals_daily(ticker)
     df_f = pd.DataFrame.from_records(fundamentals_daily)
 
-    if not fundamentals_df.empty:
+    if not df_f.empty:
         df_f['ticker'] = ticker
         df_f['date'] = pd.to_datetime(df_f['date'])
         df_f.sort_values('date', inplace=True)
@@ -133,14 +143,36 @@ print("\n[Prices]")
 print(prices.head())
 
 print("\n[Fundamentals Daily]")
-print(fundamentals_df.head())
+print(df_f.head())
 
 print("\n[Financial Statements]")
 print(df_fs.head())
 
 
+"""
+Dow 30 ETL Pipeline
 
+Purpose:
+    Collect and store historical price and fundamental data for the
+    30 constituents of the Dow Jones Industrial Average (DJIA).
 
+Clarification:
+    This pipeline is designed for data engineering and analysis purposes.
+    It does NOT attempt to reproduce the DJIA index value.
+
+Index weighting methodologies (for reference):
+    Price-weighted
+     - Index level determined by sum of stock prices / divisor
+     - Example: Dow Jones Industrial Average
+
+Market capitalization-weighted
+     - Weights based on total market value of each company
+     - Example: S&P 500
+
+Equal-weighted
+     - Each constituent assigned identical weight
+     - Used in alternative index strategies
+"""
 
 
 
@@ -232,7 +264,7 @@ print("statements:", statements_df.shape)
 
 
 
-
+#SQL 적재부분까지 완료한 후에 리팩토링하면 될듯
 
 
 
