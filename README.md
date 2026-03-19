@@ -20,12 +20,19 @@ The codebase is organized into two branches:
 ### 1. Risk Measurement (VaR & ES)
  - **File:** [`VaR_ES_Framework.py`](./VaR_ES_Framework.py)
 - Implements parametric, historical, and Monte Carlo VaR/ES
-
-- Performs regulatory-style backtesting:
-  - Kupiec unconditional coverage test
-  - Christoffersen independence test
-  - Conditional coverage test
+- Implements forward-looking backtesting:
+  - Aligns VaR(t) with realized PnL over t → t+horizon
+  - Avoids common backward-looking bias
+- Uses rolling-window VaR estimation:
+  - Reflects real-world model recalibration
+- Full backtesting framework:
+  - Kupiec (coverage)
+  - Christoffersen (independence)
+  - Conditional coverage
+  - Basel Traffic Light approach
 - Identifies model limitations such as fat tails and violation clustering
+- Empirical results show that parametric and Monte Carlo VaR tend to underestimate tail risk,
+  while historical VaR provides more stable violation frequencies.
 - Extends static models to dynamic volatility approaches:
   - EWMA (RiskMetrics)
   - GARCH (planned)
