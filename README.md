@@ -14,29 +14,44 @@ The codebase is organized into two branches:
 ### 1. Market Risk Framework (VaR & ES)
  - **File:** [`VaR_ES_Framework.py`](./VaR_ES_Framework.py)
 
-Built an end-to-end market risk framework in Python for VaR/ES estimation and backtesting.
+Built an end-to-end market risk framework in Python for multi-method VaR/ES estimation, rolling-window forecasting, and regulatory-style backtesting.
 
 #### Key Features
-- Implements Historical, Parametric, and Monte Carlo VaR/ES
-- Uses rolling-window estimation to reflect model recalibration over time
-- Applies forward-looking backtesting
-- Includes a full validation framework:
-  - Kupiec test (unconditional coverage)
-  - Christoffersen test (independence)
-  - Conditional coverage test
-  - Basel Traffic Light approach
-- Evaluates model weaknesses such as:
-  - tail-risk underestimation
-  - violation clustering
-- Compares overlapping and non-overlapping backtesting results to improve interpretation
+- Implements **Historical, Parametric, and Monte Carlo VaR/ES**
+- Uses a **rolling-window framework** to update VaR forecasts over time
+- Applies a structured validation framework:
+  - **Kupiec test** (unconditional coverage)
+  - **Christoffersen independence test**
+  - **Conditional coverage test**
+  - **Basel Traffic Light approach**
+- Compares **overlapping** and **non-overlapping** backtesting results
+- Includes supporting analysis such as:
+  - Monte Carlo simulation convergence checks
+  - interpretation of tail-risk underestimation and violation clustering
 
 #### Main Insight
-Empirical results suggest that Parametric and Monte Carlo VaR tend to underestimate tail risk, while Historical VaR produces relatively more stable violation frequencies under the tested setting.
+Empirical results suggest that Historical VaR appears to be the best-calibrated model under the tested setting, while Parametric and Monte Carlo VaR tend to underestimate tail risk, especially in the overlapping backtesting sample.  
+Additional non-overlapping tests show that part of the apparent violation clustering is mechanically induced by overlapping forward PnL construction, which improves the interpretation of independence and conditional coverage results.
 
-#### Extensions
-- **EWMA (RiskMetrics)** extension included
-- **GARCH** and **Filtered Historical Simulation (FHS)** planned
+#### Project Evolution
+This project began as a basic implementation of three VaR methods: Historical, Parametric, and Monte Carlo.
 
+As the framework expanded, the focus moved beyond point estimation toward model validation and backtesting.  
+This led to several important extensions:
+
+- moving from single VaR estimates to rolling VaR series
+- constructing forward PnL for proper backtesting alignment
+- distinguishing estimation inputs from realized backtesting targets
+- comparing overlapping and non-overlapping samples
+- identifying how overlapping forward PnL can mechanically distort independence test results
+
+Through this process, the project evolved from a basic VaR implementation into a broader risk model validation framework.
+
+#### Planned Extensions
+- **EWMA (RiskMetrics)** backtesting logic under revision
+- **GARCH** planned
+- **Filtered Historical Simulation (FHS)** planned
+  
 ### 2. Financial Data ETL Pipeline
 - **Files:**
  - [`Building_an_ETL_Data_Pipeline_for_Korean_Listed_Stocks.py`](./Building_an_ETL_Data_Pipeline_for_Korean_Listed_Stocks.py)
