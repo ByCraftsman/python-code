@@ -58,7 +58,7 @@ Through this process, the project evolved from a basic VaR implementation into a
  - [`Korean_Equity_Price_FS_ETL.py`](./Korean_Equity_Price_FS_ETL.py)
  - [`Generate_Value_Factors.py`](./Generate_Value_Factors.py)
 
-Built a multi-step data pipeline for Korean listed equities, covering universe construction, price/financial statement preprocessing, and valuation factor generation.
+Built a multi-step data pipeline for Korean listed equities, covering data collection, preprocessing, database loading, and valuation factor generation.
 
 #### Key Features
 - Builds a Korean equity master table using multiple domestic data sources
