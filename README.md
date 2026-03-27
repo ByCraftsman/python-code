@@ -61,7 +61,7 @@ Through this process, the project evolved from a basic VaR implementation into a
 Built a multi-step data pipeline for Korean listed equities, covering data collection, preprocessing, database loading, and valuation factor generation.
 
 #### Key Features
-- Builds a Korean equity master table using multiple domestic data sources
+- Organizes Korean equity data into separate MySQL tables for prices, financial statements, and valuation factors.
 - Cleans and normalizes raw equity data, including stock-type classification
 - Stores structured datasets in MySQL using UPSERT logic
 - Collects adjusted daily price data and annual/quarterly financial statements
