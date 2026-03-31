@@ -64,7 +64,7 @@ This led to several important extensions:
 
 Through this process, the project evolved from a basic VaR implementation into a broader market risk validation framework.
 
-#### Additional Notes
+#### Modeling Assumptions
 - The project is designed for risk-model comparison and interpretation
 - The framework uses a 5-day holding period and 99% confidence level
 - Mean returns are assumed to be zero for short-horizon parametric and simulation-based VaR
