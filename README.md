@@ -43,11 +43,13 @@ The goal is to provide a clear setting for comparing model behavior, backtesting
   - analysis of overlap-induced violation clustering
 
 #### Main Insight
-Within this tested portfolio and sample setting, Historical VaR appears to be the best-calibrated model among the baseline specifications, while Parametric and Monte Carlo VaR tend to underestimate tail risk under normality-based assumptions.
+Within this portfolio and sample setting, Historical VaR appears to be the best-calibrated model among the baseline models, while Parametric and Monte Carlo VaR tend to underestimate tail risk under normality-based assumptions.
 
-Additional non-overlapping tests show that part of the apparent violation clustering is mechanically induced by overlapping forward PnL construction, which improves the interpretation of independence and conditional coverage results.
+Non-overlapping tests further suggest that part of the observed violation clustering is mechanically induced by overlapping forward PnL construction, leading to a cleaner interpretation of independence and conditional coverage results.
 
-Among the volatility-based extensions, FHS delivers the strongest overall backtesting performance by combining dynamic volatility filtering with an empirical residual distribution, substantially improving tail-risk calibration relative to EWMA and standard GARCH.
+Among the volatility-based extensions, FHS shows the strongest performance, materially improving tail-risk calibration relative to EWMA and standard GARCH.
+
+Overall, Historical VaR remains the strongest model in this framework, with FHS emerging as the most effective extension.
 
 #### Project Evolution
 This project began as a basic implementation of three VaR methods: Historical, Parametric, and Monte Carlo.
