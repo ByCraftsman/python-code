@@ -1,33 +1,14 @@
 """
-This code implements a preprocessing pipeline for Korean equity price data
-and financial statements, designed for financial analysis of individual stocks
-
-본 파이프라인은 국내 주식 시장의 주가 및 재무제표 데이터를 전처리하여,
-개별 종목에 대한 다양한 금융 분석에 활용하기 위해 설계되었다.
-
-
-
-Adjusted prices are essential for backtesting, as they ensure price continuity.
-Raw prices can cause significant distortions in the returns during corporate events 
-like stock splits or reverse splits, leading to inaccurate performance analysis. Therefore, 
-Naver Finance is used as the primary data source because its charts are based on adjusted prices.
+이 코드는 국내 주식 시장의 주가 및 재무제표 데이터를 전처리하여 개별 종목에 대한 다양한 금융 분석에 활용하기 위해 설계되었다.
 
 퀀트 투자나 벡테스트에서는 수정주가가 필요하다. 일반적인 주가는 액면분할이나 액면병합 등의 사건이 있을 시, 
 수익률에 왜곡이 생길 수 있기 때문이다. 그렇기 때문에, 수정주가를 사용하는 네이버 증권을 사용하였다. 
 또한 네이버 증권은 GET 방식이라서 URL를 통해 간단하게 원하는 만큼의 시계열 데이터를 얻을 수 있었다.
 
-
-
-Although financial statement data can also be collected from Naver Finance, the site is built as a dynamic web page,
-which requires packages such as Selenium and makes the process cumbersome. In contrast, FN Guide provides
-financial statement data in a structured tabular format, with relatively stable account names and time-series column structures. 
-For these reasons, FN Guide was selected as it is more advantageous from a maintenance perspective.
-
 네이버 증권에서도 재무제표 데이터를 수집할 수 있으나, 해당 페이지는 동적 페이지로 구성되어 있어 Selenium과 같은
 패키지가 필요하여 번거롭다. 반면, FN Guide는 재무제표 데이터를 정형화된 테이블 구조로 제공하며, 
 항목명과 시계열 컬럼 구조가 비교적 안정적으로 유지된다. 유지보수차원에서도 유리하여서 FN Guide를 선택하였다.
 """
-
 
 import os
 from dotenv import load_dotenv
