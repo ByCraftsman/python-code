@@ -1,1 +1,1 @@
-2023년도에 대학수업하면서 작성한 코드입니다. 임시 보관중입니다.
+This folder contains Python files from university coursework completed in 2023. It is unrelated to the main projects in this repository and is kept here for archival purposes only.
