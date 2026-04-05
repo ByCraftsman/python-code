@@ -153,20 +153,23 @@ con = pymysql.connect(
     charset='utf8'
 )
 
-mycursor = con.cursor()
+try:
+    mycursor = con.cursor()
 
-args_fs = kor_value.values.tolist()
-mycursor.executemany(query, args_fs)
-con.commit()
+    args_fs = kor_value.values.tolist()
+    mycursor.executemany(query, args_fs)
 
-args_dy = dy_list.values.tolist()
-mycursor.executemany(query, args_dy)
-con.commit()
+    args_dy = dy_list.values.tolist()
+    mycursor.executemany(query, args_dy)
 
-con.close() #con.close() → pymysql 전용
+    con.commit()
 
+except Exception:
+    con.rollback()  # 중간 실패 시 전체 취소
+    raise
 
-
+finally:
+    con.close()
 
 
 
