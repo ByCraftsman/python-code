@@ -24,12 +24,11 @@ The test portfolio is intentionally simplified as an equal-weighted cross-asset 
 - **iShares 7–10 Year Treasury Bond ETF (IEF)**
 - **S&P 500 Index**
 
-This portfolio is intended for transparent model comparison rather than replicating an actual trading desk portfolio.
-The goal is to provide a clear setting for comparing model behavior, backtesting performance, and tail-risk estimation across different market risk approaches.
+This portfolio is intended for transparent model comparison rather than replicating an actual trading desk portfolio. 
+The goal is to provide a clear setting for comparing model behavior, backtesting performance, and differences in tail-risk sensitivity across market risk approaches.
 
 #### Key Features
 - Implements **Historical, Parametric, and Monte Carlo VaR/ES**
-- Extends the framework with **EWMA, GARCH(1,1), and Filtered Historical Simulation (FHS)**
 - Uses a **rolling-window framework** to update VaR forecasts over time
 - Applies a structured validation framework:
   - **Kupiec test** (unconditional coverage)
@@ -37,6 +36,7 @@ The goal is to provide a clear setting for comparing model behavior, backtesting
   - **Conditional coverage test**
   - **Basel-style traffic light interpretation**
 - Compares **overlapping** and **non-overlapping** backtesting results
+- Extends the framework with **EWMA, GARCH(1,1), and Filtered Historical Simulation (FHS)**
 - Includes supporting analysis such as:
   - Monte Carlo simulation convergence checks
   - interpretation of tail-risk underestimation
@@ -49,7 +49,7 @@ Non-overlapping tests further suggest that part of the observed violation cluste
 
 Among the volatility-based extensions, FHS shows the strongest performance, materially improving tail-risk calibration relative to EWMA and standard GARCH.
 
-Overall, Historical VaR remains the strongest model in this framework, with FHS emerging as the most effective extension.
+Overall, Historical VaR remains the strongest model in this framework, with FHS emerging as the most effective volatility-based extension.
 
 #### Project Evolution
 This project began as a basic implementation of three VaR methods: Historical, Parametric, and Monte Carlo.
